@@ -5,4 +5,5 @@ export interface WorkersAIChatSettings {
   Defaults to `false`.
      */
   safePrompt?: boolean;
+  gateway?: GatewayOptions
 }

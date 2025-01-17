@@ -143,6 +143,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
     const response = await this.config.binding.run(args.model, {
       messages: args.messages,
+    }, 
+    {
+      gateway: this.settings.gateway
     });
 
     if (response instanceof ReadableStream) {
