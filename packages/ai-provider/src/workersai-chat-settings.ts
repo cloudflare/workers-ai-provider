@@ -5,5 +5,8 @@ export interface WorkersAIChatSettings {
   Defaults to `false`.
      */
   safePrompt?: boolean;
+  /**
+   * Optionally set Cloudflare AI Gateway options.
+   */
   gateway?: GatewayOptions
 }
