@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.0.11
+
+### Patch Changes
+
+- [`eddaf37`](https://github.com/cloudflare/workers-ai-provider/commit/eddaf37bbe6c0c06b213a885d7ce2c35989cc564) Thanks [@threepointone](https://github.com/threepointone)! - update dependencies
+
 ## 0.0.10
 
 ### Patch Changes
