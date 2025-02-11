@@ -197,8 +197,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
           async transform(chunk, controller) {
             const chunkToText = decoder.decode(chunk as unknown as Uint8Array);
             const chunks = events(new Response(chunkToText));
-            const promptTokens = 0;
-            const completionTokens = 0;            
+            let promptTokens = 0;
+            let completionTokens = 0;            
             for await (const singleChunk of chunks) {
               if (!singleChunk.data) {
                 continue;
@@ -231,8 +231,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
               type: "finish",
               finishReason: "stop",
               usage: {
-                promptTokens: 0,
-                completionTokens: 0,
+                promptTokens: promptTokens,
+                completionTokens: completionTokens,
               },
             });
           },
