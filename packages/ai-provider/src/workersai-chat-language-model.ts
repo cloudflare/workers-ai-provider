@@ -198,7 +198,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
             const chunkToText = decoder.decode(chunk as unknown as Uint8Array);
             const chunks = events(new Response(chunkToText));
             let promptTokens = 0;
-            let completionTokens = 0;            
+            let completionTokens = 0;
             for await (const singleChunk of chunks) {
               if (!singleChunk.data) {
                 continue;
@@ -218,8 +218,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
               // Usage stats are reported in a final data message (with data.response set to ""), before "[DONE]".
               if(data.usage) {
-                promptTokens = data.usage.prompt_tokens;
-                completionTokens = data.usage.completion_tokens;
+                promptTokens = data.usage.prompt_tokens ?? 0;
+                completionTokens = data.usage.completion_tokens ?? 0;
               }
               
               controller.enqueue({
