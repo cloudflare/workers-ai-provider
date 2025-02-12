@@ -188,6 +188,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
       throw new Error("This shouldn't happen");
     }
 
+    let promptTokens = 0;
+    let completionTokens = 0;
+
     return {
       stream: response.pipeThrough(
         new TransformStream<
@@ -197,8 +200,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
           async transform(chunk, controller) {
             const chunkToText = decoder.decode(chunk as unknown as Uint8Array);
             const chunks = events(new Response(chunkToText));
-            let promptTokens = 0;
-            let completionTokens = 0;
             for await (const singleChunk of chunks) {
               if (!singleChunk.data) {
                 continue;
