@@ -141,12 +141,16 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
   ): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
     const { args, warnings } = this.getArgs(options);
 
-    const response = await this.config.binding.run(args.model, {
-      messages: args.messages,
-    }, 
-    {
-      gateway: this.settings.gateway
-    });
+    const response = await this.config.binding.run(
+      args.model,
+      {
+        messages: args.messages,
+        max_tokens: args.max_tokens,
+      },
+      {
+        gateway: this.settings.gateway,
+      }
+    );
 
     if (response instanceof ReadableStream) {
       throw new Error("This shouldn't happen");
@@ -182,6 +186,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
     const response = await this.config.binding.run(args.model, {
       messages: args.messages,
       stream: true,
+      max_tokens: args.max_tokens,
     });
 
     if (!(response instanceof ReadableStream)) {
