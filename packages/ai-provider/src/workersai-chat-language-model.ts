@@ -164,9 +164,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
       finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
       rawCall: { rawPrompt: args.messages, rawSettings: args },
       usage: {
-        // TODO: mapWorkersAIUsage(response.usage),
-        promptTokens: 0,
-        completionTokens: 0,
+        // TODO: create mapWorkersAIUsage(response.usage) and do mapping there instead,
+        promptTokens: response.usage?.prompt_tokens ?? 0,
+        completionTokens: response.usage?.completion_tokens ?? 0,
       },
       warnings,
     };
@@ -188,6 +188,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
       throw new Error("This shouldn't happen");
     }
 
+    let promptTokens = 0;
+    let completionTokens = 0;
+
     return {
       stream: response.pipeThrough(
         new TransformStream<
@@ -206,14 +209,20 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
                   type: "finish",
                   finishReason: "stop",
                   usage: {
-                    promptTokens: 0,
-                    completionTokens: 0,
+                    promptTokens: promptTokens,
+                    completionTokens: completionTokens,
                   },
                 });
                 return;
               }
               const data = JSON.parse(singleChunk.data);
 
+              // Usage stats are reported in a final data message (with data.response set to ""), before "[DONE]".
+              if(data.usage) {
+                promptTokens = data.usage.prompt_tokens ?? 0;
+                completionTokens = data.usage.completion_tokens ?? 0;
+              }
+              
               controller.enqueue({
                 type: "text-delta",
                 textDelta: data.response ?? "DATALOSS",
@@ -223,8 +232,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
               type: "finish",
               finishReason: "stop",
               usage: {
-                promptTokens: 0,
-                completionTokens: 0,
+                promptTokens: promptTokens,
+                completionTokens: completionTokens,
               },
             });
           },
