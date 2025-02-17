@@ -14,6 +14,7 @@ import { events } from "fetch-event-stream";
 type WorkersAIChatConfig = {
   provider: string;
   binding: Ai;
+  gateway?: GatewayOptions;
 };
 
 export class WorkersAIChatLanguageModel implements LanguageModelV1 {
@@ -136,13 +137,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
     const output = await this.config.binding.run(
       args.model,
-      {
-        messages: args.messages,
-        tools: args.tools,
-      },
-      {
-        gateway: this.settings.gateway,
-      }
+      { messages: args.messages, tools: args.tools },
+      { gateway: this.config.gateway ?? this.settings.gateway }
     );
 
     if (output instanceof ReadableStream) {
@@ -173,11 +169,11 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
   ): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
     const { args, warnings } = this.getArgs(options);
 
-    const response = await this.config.binding.run(args.model, {
-      messages: args.messages,
-      stream: true,
-      tools: args.tools,
-    });
+    const response = await this.config.binding.run(
+      args.model,
+      { messages: args.messages, stream: true, tools: args.tools },
+      { gateway: this.config.gateway ?? this.settings.gateway }
+    );
 
     if (!(response instanceof ReadableStream)) {
       throw new Error("This shouldn't happen");
