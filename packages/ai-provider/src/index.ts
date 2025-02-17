@@ -29,6 +29,10 @@ binding = "AI"
   ```
    **/
   binding: Ai;
+  /**
+   * Optionally set Cloudflare AI Gateway options.
+   */
+  gateway?: GatewayOptions;
 }
 
 /**
