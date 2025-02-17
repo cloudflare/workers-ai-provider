@@ -160,9 +160,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
       finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
       rawCall: { rawPrompt: args.messages, rawSettings: args },
       usage: {
-	    // TODO: mapWorkersAIUsage(response.usage),
-  		promptTokens: 0,
-	    completionTokens: 0,
+        // TODO: mapWorkersAIUsage(response.usage),
+        promptTokens: 0,
+        completionTokens: 0,
       },
       warnings,
     };
@@ -172,8 +172,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
     options: Parameters<LanguageModelV1["doStream"]>[0]
   ): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
     const { args, warnings } = this.getArgs(options);
-
-    const decoder = new TextDecoder();
 
     const response = await this.config.binding.run(args.model, {
       messages: args.messages,
@@ -185,45 +183,38 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
       throw new Error("This shouldn't happen");
     }
 
-    return {
-      stream: response.pipeThrough(
-        new TransformStream<Uint8Array, LanguageModelV1StreamPart>({
-          async transform(chunk, controller) {
-            const chunkToText = decoder.decode(chunk);
-            const chunks = events(new Response(chunkToText));
-            for await (const singleChunk of chunks) {
-              if (!singleChunk.data) {
-                continue;
-              }
-              if (singleChunk.data === "[DONE]") {
-                controller.enqueue({
-                  type: "finish",
-                  finishReason: "stop",
-                  usage: {
-                    promptTokens: 0,
-                    completionTokens: 0,
-                  },
-                });
-                return;
-              }
-              const data = JSON.parse(singleChunk.data);
+    const chunkEvent = events(new Response(response));
+    const usage = { promptTokens: 0, completionTokens: 0 };
 
+    return {
+      stream: new ReadableStream<LanguageModelV1StreamPart>({
+        async start(controller) {
+          for await (const event of chunkEvent) {
+            if (!event.data) {
+              continue;
+            }
+            if (event.data === "[DONE]") {
+              break;
+            }
+            const chunk = JSON.parse(event.data);
+            if (chunk.usage) {
+              usage.promptTokens = chunk.usage.prompt_tokens ?? 0;
+              usage.completionTokens = chunk.usage.completion_tokens ?? 0;
+            }
+            chunk.response.length &&
               controller.enqueue({
                 type: "text-delta",
-                textDelta: data.response ?? "DATALOSS",
+                textDelta: chunk.response,
               });
-            }
-            controller.enqueue({
-              type: "finish",
-              finishReason: "stop",
-              usage: {
-                promptTokens: 0,
-                completionTokens: 0,
-              },
-            });
-          },
-        })
-      ),
+          }
+          controller.enqueue({
+            type: "finish",
+            finishReason: "stop",
+            usage: usage,
+          });
+          controller.close();
+        },
+      }),
       rawCall: { rawPrompt: args.messages, rawSettings: args },
       warnings,
     };
