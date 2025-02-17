@@ -137,7 +137,13 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
     const output = await this.config.binding.run(
       args.model,
-      { messages: args.messages, tools: args.tools },
+      {
+        messages: args.messages,
+        max_tokens: args.max_tokens,
+        temperature: args.temperature,
+        top_p: args.top_p,
+        tools: args.tools,
+      },
       { gateway: this.config.gateway ?? this.settings.gateway }
     );
 
@@ -171,7 +177,14 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
     const response = await this.config.binding.run(
       args.model,
-      { messages: args.messages, stream: true, tools: args.tools },
+      {
+        messages: args.messages,
+        max_tokens: args.max_tokens,
+        temperature: args.temperature,
+        top_p: args.top_p,
+        stream: true,
+        tools: args.tools,
+      },
       { gateway: this.config.gateway ?? this.settings.gateway }
     );
 
