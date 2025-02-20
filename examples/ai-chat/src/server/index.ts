@@ -18,7 +18,6 @@ export default {
         messages: Parameters<typeof convertToCoreMessages>[0];
       }>();
       const result = streamText({
-        // @ts-expect-error
         model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
         messages: convertToCoreMessages(messages),
       });

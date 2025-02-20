@@ -1,11 +1,12 @@
 {
-  "name": "@cloudflare/example-ai-chat",
+  "name": "@cloudflare/example-tool-calling",
   "private": true,
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.1.9",
     "ai": "^4.0.14",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
