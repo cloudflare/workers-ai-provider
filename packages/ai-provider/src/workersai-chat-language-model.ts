@@ -195,7 +195,6 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
               if (!singleChunk.data) {
                 continue;
               }
-
               if (singleChunk.data === "[DONE]") {
                 controller.enqueue({
                   type: "finish",
