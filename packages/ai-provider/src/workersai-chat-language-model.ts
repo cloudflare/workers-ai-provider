@@ -190,7 +190,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
     }
 
     const chunkEvent = events(new Response(response));
-    const usage = { promptTokens: 0, completionTokens: 0 };
+    let usage = { promptTokens: 0, completionTokens: 0 };
 
     return {
       stream: new ReadableStream<LanguageModelV1StreamPart>({
@@ -204,7 +204,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
             }
             const chunk = JSON.parse(event.data);
             if (chunk.usage) {
-              chunk.usage = mapWorkersAIUsage(chunk);
+              usage = mapWorkersAIUsage(chunk);
             }
             chunk.response.length &&
               controller.enqueue({
