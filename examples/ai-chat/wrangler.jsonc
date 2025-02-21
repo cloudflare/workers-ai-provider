@@ -1,0 +1,14 @@
+{
+	"name": "workers-ai-chat",
+	"main": "src/server/index.ts",
+	"compatibility_date": "2024-07-31",
+	"assets": {
+		"directory": "public"
+	},
+	"build": {
+		"command": "esbuild src/client/index.tsx --outdir=public/dist --bundle --sourcemap --format=esm --splitting"
+	},
+	"ai": {
+		"binding": "AI"
+	}
+}
