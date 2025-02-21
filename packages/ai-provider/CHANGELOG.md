@@ -1,5 +1,15 @@
 # workers-ai-provider
 
+## 0.0.13
+
+### Patch Changes
+
+- [#27](https://github.com/cloudflare/workers-ai-provider/pull/27) [`add4120`](https://github.com/cloudflare/workers-ai-provider/commit/add4120ce09714d86917cfa891fb3072cdcbcd00) Thanks [@jiang-zhexin](https://github.com/jiang-zhexin)! - Exclude BaseAiTextToImage model
+
+- [#23](https://github.com/cloudflare/workers-ai-provider/pull/23) [`b15ad06`](https://github.com/cloudflare/workers-ai-provider/commit/b15ad067516ea3504679f8613f9893778e61dfa7) Thanks [@andyjessop](https://github.com/andyjessop)! - Fix streaming output by ensuring that events is only called once per stream
+
+- [#26](https://github.com/cloudflare/workers-ai-provider/pull/26) [`6868be7`](https://github.com/cloudflare/workers-ai-provider/commit/6868be7fc22f4c122c49043445c61eec9f41cfcc) Thanks [@andyjessop](https://github.com/andyjessop)! - configures AI Gateway to work with streamText
+
 ## 0.0.12
 
 ### Patch Changes
