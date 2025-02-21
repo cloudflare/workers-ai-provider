@@ -1,21 +1,13 @@
 import {
   type LanguageModelV1,
   type LanguageModelV1CallWarning,
-  type LanguageModelV1FinishReason,
   type LanguageModelV1StreamPart,
   UnsupportedFunctionalityError,
 } from "@ai-sdk/provider";
-import type {
-  ParseResult,
-  createEventSourceResponseHandler,
-  createJsonResponseHandler,
-  postJsonToApi,
-} from "@ai-sdk/provider-utils";
 import { z } from "zod";
 import { convertToWorkersAIChatMessages } from "./convert-to-workersai-chat-messages";
-import { mapWorkersAIFinishReason } from "./map-workersai-finish-reason";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
-import { workersAIFailedResponseHandler } from "./workersai-error";
+import type { TextGenerationModels } from "./workersai-models";
 
 import { events } from "fetch-event-stream";
 
@@ -28,13 +20,13 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
   readonly specificationVersion = "v1";
   readonly defaultObjectGenerationMode = "json";
 
-  readonly modelId: BaseAiTextGenerationModels;
+  readonly modelId: TextGenerationModels;
   readonly settings: WorkersAIChatSettings;
 
   private readonly config: WorkersAIChatConfig;
 
   constructor(
-    modelId: BaseAiTextGenerationModels,
+    modelId: TextGenerationModels,
     settings: WorkersAIChatSettings,
     config: WorkersAIChatConfig
   ) {
@@ -105,6 +97,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
           args: {
             ...baseArgs,
             response_format: { type: "json_object" },
+            tools: undefined,
           },
           warnings,
         };
@@ -141,32 +134,35 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
   ): Promise<Awaited<ReturnType<LanguageModelV1["doGenerate"]>>> {
     const { args, warnings } = this.getArgs(options);
 
-    const response = await this.config.binding.run(args.model, {
-      messages: args.messages,
-    }, 
-    {
-      gateway: this.settings.gateway
-    });
+    const output = await this.config.binding.run(
+      args.model,
+      {
+        messages: args.messages,
+        tools: args.tools,
+      },
+      {
+        gateway: this.settings.gateway,
+      }
+    );
 
-    if (response instanceof ReadableStream) {
+    if (output instanceof ReadableStream) {
       throw new Error("This shouldn't happen");
     }
 
     return {
-      text: response.response,
-      // TODO: tool calls
-      // toolCalls: response.tool_calls?.map((toolCall) => ({
-      //   toolCallType: "function",
-      //   toolCallId: toolCall.name, // TODO: what can the id be?
-      //   toolName: toolCall.name,
-      //   args: JSON.stringify(toolCall.arguments || {}),
-      // })),
+      text: output.response,
+      toolCalls: output.tool_calls?.map((toolCall) => ({
+        toolCallType: "function",
+        toolCallId: toolCall.name,
+        toolName: toolCall.name,
+        args: JSON.stringify(toolCall.arguments || {}),
+      })),
       finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
       rawCall: { rawPrompt: args.messages, rawSettings: args },
       usage: {
-        // TODO: mapWorkersAIUsage(response.usage),
-        promptTokens: 0,
-        completionTokens: 0,
+	    // TODO: mapWorkersAIUsage(response.usage),
+  		promptTokens: 0,
+	    completionTokens: 0,
       },
       warnings,
     };
@@ -182,6 +178,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
     const response = await this.config.binding.run(args.model, {
       messages: args.messages,
       stream: true,
+      tools: args.tools,
     });
 
     if (!(response instanceof ReadableStream)) {
@@ -190,12 +187,9 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
     return {
       stream: response.pipeThrough(
-        new TransformStream<
-          ParseResult<z.infer<typeof workersAIChatChunkSchema>>,
-          LanguageModelV1StreamPart
-        >({
+        new TransformStream<Uint8Array, LanguageModelV1StreamPart>({
           async transform(chunk, controller) {
-            const chunkToText = decoder.decode(chunk as unknown as Uint8Array);
+            const chunkToText = decoder.decode(chunk);
             const chunks = events(new Response(chunkToText));
             for await (const singleChunk of chunks) {
               if (!singleChunk.data) {

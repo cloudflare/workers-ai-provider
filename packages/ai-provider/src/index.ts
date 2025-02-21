@@ -1,9 +1,10 @@
 import { WorkersAIChatLanguageModel } from "./workersai-chat-language-model";
 import type { WorkersAIChatSettings } from "./workersai-chat-settings";
+import type { TextGenerationModels } from "./workersai-models";
 
 export interface WorkersAI {
   (
-    modelId: BaseAiTextGenerationModels,
+    modelId: TextGenerationModels,
     settings?: WorkersAIChatSettings
   ): WorkersAIChatLanguageModel;
 
@@ -11,21 +12,21 @@ export interface WorkersAI {
    * Creates a model for text generation.
    **/
   chat(
-    modelId: BaseAiTextGenerationModels,
+    modelId: TextGenerationModels,
     settings?: WorkersAIChatSettings
   ): WorkersAIChatLanguageModel;
 }
 
 export interface WorkersAISettings {
   /**
-   * Provide an `env.AI` binding to use for the AI inference. 
-   * You can set up an AI bindings in your Workers project 
-   * by adding the following this to `wrangler.toml`: 
-  
+   * Provide an `env.AI` binding to use for the AI inference.
+   * You can set up an AI bindings in your Workers project
+   * by adding the following this to `wrangler.toml`:
+
   ```toml
 [ai]
 binding = "AI"
-  ``` 
+  ```
    **/
   binding: Ai;
 }
@@ -35,7 +36,7 @@ binding = "AI"
  **/
 export function createWorkersAI(options: WorkersAISettings): WorkersAI {
   const createChatModel = (
-    modelId: BaseAiTextGenerationModels,
+    modelId: TextGenerationModels,
     settings: WorkersAIChatSettings = {}
   ) =>
     new WorkersAIChatLanguageModel(modelId, settings, {
@@ -44,7 +45,7 @@ export function createWorkersAI(options: WorkersAISettings): WorkersAI {
     });
 
   const provider = function (
-    modelId: BaseAiTextGenerationModels,
+    modelId: TextGenerationModels,
     settings?: WorkersAIChatSettings
   ) {
     if (new.target) {
