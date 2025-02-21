@@ -10,13 +10,15 @@ npm install workers-ai-provider
 
 ## Usage
 
-First, setup an AI binding in `wrangler.toml` in your Workers project:
+First, setup an AI binding in the Wrangler config in your Workers project:
 
-```toml
-# ...
-[ai]
-binding = "AI"
-# ...
+```jsonc
+{
+	// ...
+	"ai": {
+		"binding": "AI"
+	}
+}
 ```
 
 Then in your Worker, import the factory function and create a new AI provider:
@@ -36,7 +38,7 @@ export default {
     // Use the AI provider to interact with the Vercel AI SDK
     // Here, we generate a chat stream based on a prompt
     const text = await streamText({
-      model: workersai("@cf/meta/llama-2-7b-chat-int8"),
+      model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
       messages: [
         {
           role: "user",
