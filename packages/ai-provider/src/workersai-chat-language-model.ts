@@ -10,6 +10,7 @@ import type { WorkersAIChatSettings } from "./workersai-chat-settings";
 import type { TextGenerationModels } from "./workersai-models";
 
 import { events } from "fetch-event-stream";
+import {mapWorkersAIUsage} from "./map-workersai-usage";
 
 type WorkersAIChatConfig = {
   provider: string;
@@ -161,11 +162,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
       })),
       finishReason: "stop", // TODO: mapWorkersAIFinishReason(response.finish_reason),
       rawCall: { rawPrompt: args.messages, rawSettings: args },
-      usage: {
-        // TODO: mapWorkersAIUsage(response.usage),
-        promptTokens: 0,
-        completionTokens: 0,
-      },
+      usage: mapWorkersAIUsage(output),
       warnings,
     };
   }
@@ -207,8 +204,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
             }
             const chunk = JSON.parse(event.data);
             if (chunk.usage) {
-              usage.promptTokens = chunk.usage.prompt_tokens ?? 0;
-              usage.completionTokens = chunk.usage.completion_tokens ?? 0;
+				chunk.usage = mapWorkersAIUsage(chunk);
             }
             chunk.response.length &&
               controller.enqueue({
