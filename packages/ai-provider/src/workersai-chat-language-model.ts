@@ -10,7 +10,7 @@ import type { WorkersAIChatSettings } from "./workersai-chat-settings";
 import type { TextGenerationModels } from "./workersai-models";
 
 import { events } from "fetch-event-stream";
-import {mapWorkersAIUsage} from "./map-workersai-usage";
+import { mapWorkersAIUsage } from "./map-workersai-usage";
 
 type WorkersAIChatConfig = {
   provider: string;
@@ -204,7 +204,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
             }
             const chunk = JSON.parse(event.data);
             if (chunk.usage) {
-				chunk.usage = mapWorkersAIUsage(chunk);
+              chunk.usage = mapWorkersAIUsage(chunk);
             }
             chunk.response.length &&
               controller.enqueue({
