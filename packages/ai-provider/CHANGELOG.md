@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.0.12
+
+### Patch Changes
+
+- [#21](https://github.com/cloudflare/workers-ai-provider/pull/21) [`6e71dd2`](https://github.com/cloudflare/workers-ai-provider/commit/6e71dd2ec07f573fac2700a195a8dcffc6a85495) Thanks [@andyjessop](https://github.com/andyjessop)! - Fixes tool calling for generateText
+
 ## 0.0.11
 
 ### Patch Changes
