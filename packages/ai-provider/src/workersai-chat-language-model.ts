@@ -159,7 +159,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
 
     return {
       text:
-        typeof output.response === "object"
+        typeof output.response === "object" && output.response !== null
           ? JSON.stringify(output.response) // ai-sdk expects a string here
           : output.response,
       toolCalls: output.tool_calls?.map((toolCall) => ({
