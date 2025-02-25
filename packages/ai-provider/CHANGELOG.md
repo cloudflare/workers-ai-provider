@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.1.1
+
+### Patch Changes
+
+- [#32](https://github.com/cloudflare/workers-ai-provider/pull/32) [`9ffc5b8`](https://github.com/cloudflare/workers-ai-provider/commit/9ffc5b8640495440d0237ca3a201aaef1c7f441a) Thanks [@andyjessop](https://github.com/andyjessop)! - Fixes structured outputs
+
 ## 0.1.0
 
 ### Minor Changes
