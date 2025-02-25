@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.1.0
+
+### Minor Changes
+
+- [#29](https://github.com/cloudflare/workers-ai-provider/pull/29) [`762b37b`](https://github.com/cloudflare/workers-ai-provider/commit/762b37b05aee1ab61838923ad1100d2db7aa4569) Thanks [@threepointone](https://github.com/threepointone)! - trigger a minor release
+
 ## 0.0.13
 
 ### Patch Changes
