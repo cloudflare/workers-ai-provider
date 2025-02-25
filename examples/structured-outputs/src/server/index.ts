@@ -16,8 +16,6 @@ export default {
       }>();
       const workersai = createWorkersAI({ binding: env.AI });
 
-      console.log(messages);
-
       // @ts-expect-error type instantiation too deep
       const { object } = await generateObject({
         model: workersai("@cf/meta/llama-3.1-8b-instruct"),
