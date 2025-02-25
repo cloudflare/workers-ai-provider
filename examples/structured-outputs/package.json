@@ -1,5 +1,5 @@
 {
-  "name": "@cloudflare/example-tool-calling",
+  "name": "@cloudflare/example-structured-outputs",
   "private": true,
   "scripts": {
     "start": "wrangler dev",

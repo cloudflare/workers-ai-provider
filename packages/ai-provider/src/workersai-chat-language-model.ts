@@ -98,7 +98,10 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
         return {
           args: {
             ...baseArgs,
-            response_format: { type: "json_object" },
+            response_format: {
+              type: "json_schema",
+              json_schema: mode.schema,
+            },
             tools: undefined,
           },
           warnings,
@@ -144,6 +147,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
         temperature: args.temperature,
         tools: args.tools,
         top_p: args.top_p,
+        // @ts-expect-error response_format not yet added to types
+        response_format: args.response_format,
       },
       { gateway: this.config.gateway ?? this.settings.gateway }
     );
