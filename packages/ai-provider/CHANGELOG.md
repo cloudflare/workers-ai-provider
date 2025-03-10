@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.1.2
+
+### Patch Changes
+
+- [#35](https://github.com/cloudflare/workers-ai-provider/pull/35) [`9e74cc9`](https://github.com/cloudflare/workers-ai-provider/commit/9e74cc9ac939d77602d5a9873e717d9cd52e734f) Thanks [@andyjessop](https://github.com/andyjessop)! - Ensures that tool call data is available to model, by providing the JSON of the tool call as the content in the assistant message.
+
 ## 0.1.1
 
 ### Patch Changes
