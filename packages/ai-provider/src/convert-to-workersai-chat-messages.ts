@@ -53,7 +53,7 @@ export function convertToWorkersAIChatMessages(
               break;
             }
             case "tool-call": {
-			  text = JSON.stringify({ name: part.toolName, parameters: part.args });
+              text = JSON.stringify({ name: part.toolName, parameters: part.args });
 
               toolCalls.push({
                 id: part.toolCallId,
