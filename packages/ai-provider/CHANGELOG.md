@@ -1,5 +1,11 @@
 # workers-ai-provider
 
+## 0.1.3
+
+### Patch Changes
+
+- [#39](https://github.com/cloudflare/workers-ai-provider/pull/39) [`9add2b5`](https://github.com/cloudflare/workers-ai-provider/commit/9add2b5c75e0c96e9ba936717a5fc399962f0f01) Thanks [@andyjessop](https://github.com/andyjessop)! - Trigger release for recent bug fixes
+
 ## 0.1.2
 
 ### Patch Changes
