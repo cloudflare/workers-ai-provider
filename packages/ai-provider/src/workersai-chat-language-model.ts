@@ -11,7 +11,7 @@ import type { TextGenerationModels } from "./workersai-models";
 
 import { events } from "fetch-event-stream";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
-import type {WorkersAIChatPrompt} from "./workersai-chat-prompt";
+import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
 type WorkersAIChatConfig = {
   provider: string;
@@ -184,7 +184,7 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
     // [1] When the latest message is not a tool response, we use the regular generate function
     // and simulate it as a streamed response in order to satisfy the AI SDK's interface for
     // doStream...
-    if (lastMessageWasUser(args.messages)) {
+    if (args.tools?.length && lastMessageWasUser(args.messages)) {
       const response = await this.doGenerate(options);
 
       if ((response instanceof ReadableStream)) {
