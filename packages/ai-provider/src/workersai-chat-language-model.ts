@@ -11,6 +11,7 @@ import type { TextGenerationModels } from "./workersai-models";
 
 import { events } from "fetch-event-stream";
 import { mapWorkersAIUsage } from "./map-workersai-usage";
+import type { WorkersAIChatPrompt } from "./workersai-chat-prompt";
 
 type WorkersAIChatConfig = {
   provider: string;
@@ -180,6 +181,47 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
   ): Promise<Awaited<ReturnType<LanguageModelV1["doStream"]>>> {
     const { args, warnings } = this.getArgs(options);
 
+    // [1] When the latest message is not a tool response, we use the regular generate function
+    // and simulate it as a streamed response in order to satisfy the AI SDK's interface for
+    // doStream...
+    if (args.tools?.length && lastMessageWasUser(args.messages)) {
+      const response = await this.doGenerate(options);
+
+      if ((response instanceof ReadableStream)) {
+        throw new Error("This shouldn't happen");
+      }
+
+      return {
+        stream: new ReadableStream<LanguageModelV1StreamPart>({
+          async start(controller) {
+            if (response.text) {
+              controller.enqueue({
+                type: "text-delta",
+                textDelta: response.text,
+              })
+            }
+            if (response.toolCalls) {
+              for (const toolCall of response.toolCalls) {
+                controller.enqueue({
+                  type: "tool-call",
+                  ...toolCall,
+                })
+              }
+            }
+            controller.enqueue({
+              type: "finish",
+              finishReason: "stop",
+              usage: response.usage,
+            });
+            controller.close();
+          },
+        }),
+        rawCall: { rawPrompt: args.messages, rawSettings: args },
+        warnings,
+      };
+    }
+
+    // [2] ...otherwise, we just proceed as normal and stream the response directly from the remote model.
     const response = await this.config.binding.run(
       args.model,
       {
@@ -189,6 +231,8 @@ export class WorkersAIChatLanguageModel implements LanguageModelV1 {
         temperature: args.temperature,
         tools: args.tools,
         top_p: args.top_p,
+        // @ts-expect-error response_format not yet added to types
+        response_format: args.response_format,
       },
       { gateway: this.config.gateway ?? this.settings.gateway }
     );
@@ -296,4 +340,8 @@ function prepareToolsAndToolChoice(
       throw new Error(`Unsupported tool choice type: ${exhaustiveCheck}`);
     }
   }
+}
+
+function lastMessageWasUser(messages: WorkersAIChatPrompt) {
+  return messages.length > 0 && messages[messages.length - 1].role === "user";
 }

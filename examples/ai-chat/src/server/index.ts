@@ -1,5 +1,6 @@
-import { convertToCoreMessages, streamText } from "ai";
+import {convertToCoreMessages, streamText, tool} from "ai";
 import { createWorkersAI } from "workers-ai-provider/src";
+import z from "zod";
 
 export interface Env {
   AI: Ai;
@@ -17,9 +18,21 @@ export default {
       const { messages } = await request.json<{
         messages: Parameters<typeof convertToCoreMessages>[0];
       }>();
+      const weather = tool({
+        description: "Get the weather in a location",
+        parameters: z.object({
+            location: z.string().describe("The location to get the weather for"),
+        }),
+        execute: async ({ location }) =>
+          location === "London" ? "Raining" : "Sunny",
+      });
       const result = streamText({
         model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
         messages: convertToCoreMessages(messages),
+        tools: {
+          weather
+        },
+        maxSteps: 5,
       });
       return result.toDataStreamResponse({
         headers: {
