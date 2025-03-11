@@ -26,28 +26,23 @@ export default {
         execute: async ({ location }) =>
           location === "London" ? "Raining" : "Sunny",
       });
-      try {
-        const result = streamText({
-          model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
-          messages: convertToCoreMessages(messages),
-          tools: {
-            weather
-          },
-          maxSteps: 5,
-        });
-        return result.toDataStreamResponse({
-          headers: {
-            // add these headers to ensure that the
-            // response is chunked and streamed
-            "Content-Type": "text/x-unknown",
-            "content-encoding": "identity",
-            "transfer-encoding": "chunked",
-          },
-        });
-      } catch (e) {
-        console.log(JSON.stringify(e));
-      }
-
+      const result = streamText({
+        model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
+        messages: convertToCoreMessages(messages),
+        tools: {
+          weather
+        },
+        maxSteps: 5,
+      });
+      return result.toDataStreamResponse({
+        headers: {
+          // add these headers to ensure that the
+          // response is chunked and streamed
+          "Content-Type": "text/x-unknown",
+          "content-encoding": "identity",
+          "transfer-encoding": "chunked",
+        },
+      });
     }
 
     return new Response("Not Found!!", { status: 404 });
