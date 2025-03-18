@@ -58,6 +58,25 @@ export default {
 };
 ```
 
+You can also use your Cloudflare credentials to create the provider, for example if you want to use Cloudflare AI outside of the Worker environment. For example, here is how you can use Cloudflare AI in a Node script:
+
+```js
+const workersai = createWorkersAI({
+  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+  apiKey: process.env.CLOUDFLARE_API_KEY
+});
+
+const text = await streamText({
+  model: workersai("@cf/meta/llama-2-7b-chat-int8"),
+  messages: [
+    {
+      role: "user",
+      content: "Write an essay about hello world",
+    },
+  ],
+});
+```
+
 For more info, refer to the documentation of the [Vercel AI SDK](https://sdk.vercel.ai/).
 
 ### Credits
