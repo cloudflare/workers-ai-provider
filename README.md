@@ -1,5 +1,7 @@
 **The workers-ai-provider has moved to the [Cloudflare AI repo](https://github.com/cloudflare/ai/tree/main/packages/workers-ai-provider). Come over and join us there!**
 
+---
+
 # ⛅️ ✨ workers-ai-provider ✨ ⛅️
 
 A custom provider that enables [Workers AI](https://ai.cloudflare.com/)'s models for the [Vercel AI SDK](https://sdk.vercel.ai/).
